@@ -119,16 +119,16 @@ def load_images_and_grounds(imgs_path,gt_path,nb_imgs):
     return imgs, gt_imgs
 
 
-def crop_images_train(ratio_train_val, imgs, grounds):
+def crop_images_train(ratio_train_val, imgs, grounds,w,h):
 
-    # crop images to their 256*256 counterparts
+    # crop images to their w*h counterparts
     cropped_imgs = []
     cropped_targets = []
     end_train = int(ratio_train_val*len(imgs))
     
     for i in range(len(imgs)):
-        cropped_img, k, l = img_rnd_crop(imgs[i], 256, 256)
-        cropped_target, _, _ = img_rnd_crop(grounds[i], 256, 256, k, l)
+        cropped_img, k, l = img_rnd_crop(imgs[i], w, h)
+        cropped_target, _, _ = img_rnd_crop(grounds[i], w, h, k, l)
         cropped_imgs.append(cropped_img)
         cropped_targets.append(cropped_target)
 
