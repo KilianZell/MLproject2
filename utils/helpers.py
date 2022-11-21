@@ -48,7 +48,7 @@ def img_rnd_crop(im, w, h, i = -1, j = -1):
     is_2d = len(im.shape) < 3
     imgwidth = im.shape[len(im.shape)-2]
     imgheight = im.shape[len(im.shape)-1]
-    if (i == -1 and j == -1):
+    if (i == -1 and j == -1): # random center for the crop
         i = int(uniform(0, imgwidth-w-1))
         j = int(uniform(0, imgheight-h-1))
     if is_2d:
@@ -119,20 +119,29 @@ def load_images_and_grounds(imgs_path,gt_path,nb_imgs):
     return imgs, gt_imgs
 
 
-def crop_images_train(ratio_train_val, imgs, grounds,w,h):
+def crop_images_train(ratio_train_val, imgs, grounds,w,h,nb_train):
 
     # crop images to their w*h counterparts
     cropped_imgs = []
     cropped_targets = []
-    end_train = int(ratio_train_val*len(imgs))
+    end_train = int(ratio_train_val*nb_train)
     
-    for i in range(len(imgs)):
+    for q in range(nb_train // len(imgs)):
+        # on crop plusieurs fois pour avoir le bon nombre d'échantillons
+        for i in range(len(imgs)): 
+            cropped_img, k, l = img_rnd_crop(imgs[i], w, h)
+            cropped_target, _, _ = img_rnd_crop(grounds[i], w, h, k, l)
+            cropped_imgs.append(cropped_img)
+            cropped_targets.append(cropped_target)
+    # puis on complète
+    for i in range(nb_train % len(imgs)):
         cropped_img, k, l = img_rnd_crop(imgs[i], w, h)
         cropped_target, _, _ = img_rnd_crop(grounds[i], w, h, k, l)
         cropped_imgs.append(cropped_img)
         cropped_targets.append(cropped_target)
+        
 
-    x = list(range(len(imgs)))
+    x = list(range(nb_train))
     random.shuffle(x)
 
     train_input = [cropped_imgs[i] for i in x[:end_train]]
