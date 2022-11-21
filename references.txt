@@ -1,0 +1,2 @@
+only deep NN (not CNN) which works pretty well and is quite fast: https://link.springer.com/content/pdf/10.1007/978-981-16-0733-2.pdf
+method with CNN (U-net)->see the dice loss: https://medium.com/@nithishmailme/satellite-imagery-road-segmentation-ad2964dc3812
