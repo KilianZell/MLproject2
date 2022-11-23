@@ -70,7 +70,8 @@ def check_accuracy(loader, model, device="cpu"):
 def save_predictions_as_masks(DataLoader, model, folder="saved_predictions", device="cpu"):
     #Save predictions as binary mask images
     model.eval()
-
+    
+    n = 1
     for idx, (x, y) in enumerate(DataLoader):
         x = x.to(device=device)
 
@@ -78,7 +79,6 @@ def save_predictions_as_masks(DataLoader, model, folder="saved_predictions", dev
             preds = torch.sigmoid(model(x))                 #Compute the sigmoid of the model output
             preds = (preds > 0.5).float()                   #Evalute the sigmoid of the model output with a threshold (output 1 or 0)
 
-        n = 1
         for pred in preds:                                  #Generate and save predictions as mask images
             torchvision.utils.save_image(
             pred, f"{folder}/pred_{n}.png"
