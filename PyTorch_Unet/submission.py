@@ -17,8 +17,8 @@ from utils import (
 )
 
 DEVICE = "cpu"
-IMAGE_HEIGHT = 600  # 400 originally
-IMAGE_WIDTH = 600  # 400 originally
+IMAGE_HEIGHT = 608
+IMAGE_WIDTH = 608
 test_number = 50
 
 if __name__ == '__main__':
