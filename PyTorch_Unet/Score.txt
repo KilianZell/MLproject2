@@ -63,3 +63,17 @@ IMAGE_WIDTH = 400
 F1 SCORE: 0.834
 ACCURACY: 0.910
 
+-----Submission #205707
+LEARNING_RATE = 1e-4
+BATCH_SIZE = 5
+NUM_EPOCHS = 13
+NUM_WORKERS = 6
+IMAGE_HEIGHT = 400
+IMAGE_WIDTH = 400
+
+-> 1000 train images
+
+F1 SCORE: 0.869
+ACCURACY: 0.932
+(correction of output size to 608 instead of 600)
+
