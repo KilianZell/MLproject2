@@ -2,9 +2,18 @@ import torch
 import torch.nn as nn
 import torchvision.transforms.functional as TF
 
-class DoubleConv(nn.Module):                                                    #Double conv. object (will be called at each step)
-    
-    def __init__(self, in_channels, out_channels):                              #Function called everytime a DoubleConv obj is created, self -> the double Conv in itself
+class DoubleConv(nn.Module):                                                   
+    """
+    Class that represents a double convolution (happenning at each step of the Unet)
+    """
+    def __init__(self, in_channels, out_channels):
+        """
+        Function that initiates DoubleConv.
+        Input:
+            - self: the DoubleConv that is initiated
+            - in_channels: number of channels in the input image
+            - out_channels: number of channels produced by the convolution 
+        """                              
         super(DoubleConv, self).__init__()                                      #Avoid referring to the base class explicitly
         
         self.conv = nn.Sequential(                                              #Sequential container.
@@ -19,13 +28,35 @@ class DoubleConv(nn.Module):                                                    
             nn.ReLU(inplace=True),
         )
 
-    def forward(self, x):                                                       #call to get the double conv. from input x
+    def forward(self, x):
+        """
+        Modelize one step of convolution.
+        Input:
+            - self: the DoubleConv in question
+            - x: data to be convoluted
+        Output:
+            - The convulation result of x
+        """                                                       
         return self.conv(x)
 
-class UNET(nn.Module):                                                          #U-net object
+class UNET(nn.Module): 
+    """
+    Class that represents a UNET model (called one time per training)
+    """                                                  
     def __init__(
             self, in_channels=3, out_channels=1, features=[64, 128, 256, 512],  #Single binary output (single output channel)
     ):
+        """
+        Function that initializes the UNET.
+        Input:
+            - self: The UNET in question
+            - in_channels: number of channels in the input image 
+                (defoult 3 because images are RGB)
+            - out_channels: number of channels produced by the UNET
+                (defoult 1 because out put masks are B&W)
+            - Features: list of image feature at given steps 
+                (at each step the number of features is divede/multiplied by 2)
+        """
         super(UNET, self).__init__()                                            #Avoid referring to the base class explicitly
 
         self.ups = nn.ModuleList()                                              #Declare list of ups
@@ -53,6 +84,15 @@ class UNET(nn.Module):                                                          
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)   #set number of channeles to 1
 
     def forward(self, x):
+        """
+        Function that modelizes an entire step of the UNET. Note that here skip connections are 
+        used in assending steps to avoid the degradation problem.
+        Input:
+            - self: the UNET in question
+            - x: the initial data
+        Output:
+            - self.final_conv(x): the result of the final convolution
+        """
         skip_connections = []
 
         for down in self.downs:
@@ -76,3 +116,11 @@ class UNET(nn.Module):                                                          
             x = self.ups[idx+1](concat_skip)                                    #double conv
 
         return self.final_conv(x)                                               #returns the last conv of x after the unet
+
+
+        """
+        References:
+            - https://arxiv.org/abs/1505.04597
+            - https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/
+            - https://towardsdatascience.com/unet-line-by-line-explanation-9b191c76baf5 
+        """
