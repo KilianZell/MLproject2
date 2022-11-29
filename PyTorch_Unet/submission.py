@@ -10,10 +10,6 @@ import torch.optim as optim
 from model import UNET
 from utils import (
     load_trained_model,
-    save_trained_model,
-    get_loaders,
-    check_accuracy,
-    save_predictions_as_masks,
 )
 
 DEVICE = "cpu"
@@ -43,8 +39,8 @@ if __name__ == '__main__':
     device="cpu"
 
     for i in range(test_number):
-        test_dir =  "data/test/test_" + str(i+1)
-        test_maskdir = "data/test/test_" + str(i+1)
+        test_dir =  "data/test_set_images/test_" + str(i+1)
+        test_maskdir = "data/test_set_images/test_" + str(i+1)
 
         print(test_maskdir, end="\r")
 

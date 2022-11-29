@@ -15,20 +15,32 @@ from utils import (
 
 #------Hyperparameters--------
 LEARNING_RATE = 1e-4
-DEVICE = "cpu"
-BATCH_SIZE = 32
-NUM_EPOCHS = 5
-NUM_WORKERS = 2
-IMAGE_HEIGHT = 400  # 400 originally
-IMAGE_WIDTH = 400  # 400 originally
+REGULARIZATION = 0
+DEVICE = torch.device("cpu")
+BATCH_SIZE = 5
+NUM_EPOCHS = 50 
+NUM_WORKERS = 8
 PIN_MEMORY = True
-LOAD_MODEL = False
-TRAIN_IMG_DIR =     "data/aug_data/train/images/"
-TRAIN_MASK_DIR =    "data/aug_data/train/masks/"
-VAL_IMG_DIR =       "data/aug_data/val/images/"
-VAL_MASK_DIR =      "data/aug_data/val/masks/"
+LOAD_MODEL = False #False
 
-def train_fn(loader, model, optimizer, loss_fn, scaler):    
+IMAGE_HEIGHT = 128  # 256 originally, please decomment in train_function if modified
+IMAGE_WIDTH = 128   # 256 originally, please decomment in train_function if modified
+
+TRAIN_IMG_DIR =     "data/processing/train/images/"
+TRAIN_MASK_DIR =    "data/processing/train/masks/"
+VAL_IMG_DIR =       "data/processing/val/images/"
+VAL_MASK_DIR =      "data/processing/val/masks/"
+
+def train_fn(loader, model, optimizer, loss_fn, scaler):
+    """
+    Function that trains one epoch.
+    Input:
+        - loader: the Dataloader that will be trained
+        - model: the UNET used
+        - optimizer: the optimizer used to train the model
+        - loss_fn: the loss function used to evaluate the model
+        - scaler: will help perform the steps of gradient scaling conveniently
+    """    
     #Training of 1 epoch
     loop = tqdm(loader)                                     #Initiate the progress bar
 
@@ -56,9 +68,9 @@ def main():
     #Set the transformations for train dataset       
         [
             A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
-            A.Rotate(limit=35, p=1.0),
-            A.HorizontalFlip(p=0.5),
-            A.VerticalFlip(p=0.1),
+            A.Rotate(limit=90, p=0.2),
+            A.HorizontalFlip(p=0.2),
+            A.VerticalFlip(p=0.2),
             A.Normalize(
                 mean=[0.0, 0.0, 0.0],
                 std=[1.0, 1.0, 1.0],
@@ -71,7 +83,6 @@ def main():
     val_functions = A.Compose(
     #Set the transformations for validation dataset 
         [
-            A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
             A.Normalize(
                 mean=[0.0, 0.0, 0.0],
                 std=[1.0, 1.0, 1.0],
@@ -82,8 +93,11 @@ def main():
     )
 
     model = UNET(in_channels=3, out_channels=1).to(DEVICE)          #Declare model from class UNET
-    loss_fn = nn.BCEWithLogitsLoss()                                #Calls binary crossentropy from torch library
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)    #Calls adam optimizer from torch library
+    
+    loss_fn = nn.BCEWithLogitsLoss()                                #Calls binary crossentropy from torch library, This loss combines a Sigmoid layer and the BCELoss in one single class. This version is more numerically stable than using a plain Sigmoid followed by a BCELoss as, by combining the operations into one layer, we take advantage of the log-sum-exp trick for numerical stability.
+
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE, 
+                            weight_decay=REGULARIZATION)            #Calls adam optimizer from torch library (slowly decreses the learning rate)
 
     train_loader, val_loader = get_loaders(                         #Prepare data to load in the model
         TRAIN_IMG_DIR,
@@ -97,8 +111,8 @@ def main():
         PIN_MEMORY,
     )
 
-    #if LOAD_MODEL:
-        #load_trained_model(torch.load("my_checkpoint.pth.tar"), model)
+    if LOAD_MODEL:
+        load_trained_model(torch.load("my_checkpoint.pth.tar"), model)
 
     check_accuracy(val_loader, model, device=DEVICE)                #Check accuracy at every step
     scaler = torch.cuda.amp.GradScaler()
