@@ -1,0 +1,4 @@
+python3 data_augmentation.py
+python3 train.py
+python3 submission.py
+python3 mask_to_submission.py
