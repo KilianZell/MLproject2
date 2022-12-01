@@ -19,7 +19,7 @@ from utils import (
 #------Hyperparameters--------
 LEARNING_RATE = 1e-5
 REGULARIZATION = 0
-DEVICE = torch.device("cpu")
+DEVICE = torch.device("cpu") #"gpu" for colab
 BATCH_SIZE = 5
 NUM_EPOCHS = 50 
 NUM_WORKERS = 1
