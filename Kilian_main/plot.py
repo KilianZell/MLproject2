@@ -10,7 +10,7 @@ def plot_loss(losses, val_losses, file_name, epoch):
     plt.plot(epochs, val_loss, 'r', label='Validation loss')
     plt.title('Training and validation loss')
     plt.xlabel('Epochs')
-    plt.ylabel('Loss')
+    plt.ylabel('val_Loss')
     plt.legend()
     plt.savefig(file_name)
     plt.close

@@ -102,7 +102,7 @@ def check_accuracy(loader, model, device="cpu"):
     
     model.train()                                           #Continue to train the model
 
-    return num_correct/num_pixels*100
+    return (num_correct/num_pixels*100).cpu()
 
 def save_predictions_as_masks(DataLoader, model, folder="saved_predictions", device="cpu"):
     """

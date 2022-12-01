@@ -17,11 +17,11 @@ from utils import (
 )
 
 #------Hyperparameters--------
-LEARNING_RATE = 1e-5
+LEARNING_RATE = 1e-4
 REGULARIZATION = 0
-DEVICE = torch.device("cpu") #"gpu" for colab
+DEVICE = "cuda"
 BATCH_SIZE = 5
-NUM_EPOCHS = 50 
+NUM_EPOCHS = 100 
 NUM_WORKERS = 1
 PIN_MEMORY = False
 LOAD_MODEL = False
@@ -29,10 +29,10 @@ LOAD_MODEL = False
 IMAGE_HEIGHT = 256 # 256 originally
 IMAGE_WIDTH = 256  # 256 originally
 
-TRAIN_IMG_DIR =     "data/processing/train/images/"
-TRAIN_MASK_DIR =    "data/processing/train/masks/"
-VAL_IMG_DIR =       "data/processing/val/images/"
-VAL_MASK_DIR =      "data/processing/val/masks/"
+TRAIN_IMG_DIR =     "/content/data/processing/train/images"
+TRAIN_MASK_DIR =    "/content/data/processing/train/masks"
+VAL_IMG_DIR =       "/content/data/processing/val/images"
+VAL_MASK_DIR =      "/content/data/processing/val/masks"
 
 def train_fn(loader, model, optimizer, loss_fn, scaler):
     """
@@ -126,7 +126,8 @@ def main():
     scaler = torch.cuda.amp.GradScaler()
 
     losses = []
-    accuracies = []
+    accuracies_val = []
+    accuracies_train = []
     for epoch in range(NUM_EPOCHS):
     #Train model for n epochs
         print("Epoch: ", epoch+1)
@@ -139,15 +140,16 @@ def main():
         }
         save_trained_model(checkpoint)
 
-        accuracies.append(check_accuracy(val_loader, model, device=DEVICE))            #Check accuracy
+        accuracies_train.append(check_accuracy(train_loader, model, device=DEVICE))
+        accuracies_val.append(check_accuracy(val_loader, model, device=DEVICE))
 
                                                                     
         save_predictions_as_masks(                                  #Get masks images from our predictions
             val_loader, model, folder="saved_predictions/", 
             device=DEVICE
         )
-        plot_loss(losses, losses, "loss.png", epoch)
-        plot_accuracy(accuracies, accuracies, "accuracy.png", epoch)
+        plot_loss(losses, losses, "plots/loss.png", epoch)
+        plot_accuracy(accuracies_train, accuracies_val, "accuracy.png", epoch)
 
 
 if __name__ == "__main__":                                          #Needed for NUM_WORKERS
