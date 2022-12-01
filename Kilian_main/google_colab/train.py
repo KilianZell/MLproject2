@@ -17,7 +17,7 @@ from utils import (
 )
 
 #------Hyperparameters--------
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-4
 REGULARIZATION = 0
 DEVICE = "cuda"
 BATCH_SIZE = 5
@@ -126,7 +126,8 @@ def main():
     scaler = torch.cuda.amp.GradScaler()
 
     losses = []
-    accuracies = []
+    accuracies_val = []
+    accuracies_train = []
     for epoch in range(NUM_EPOCHS):
     #Train model for n epochs
         print("Epoch: ", epoch+1)
@@ -139,7 +140,8 @@ def main():
         }
         save_trained_model(checkpoint)
 
-        accuracies.append(check_accuracy(val_loader, model, device=DEVICE))           #Check accuracy
+        accuracies_train.append(check_accuracy(train_loader, model, device=DEVICE))
+        accuracies_val.append(check_accuracy(val_loader, model, device=DEVICE))
 
                                                                     
         save_predictions_as_masks(                                  #Get masks images from our predictions
@@ -147,7 +149,7 @@ def main():
             device=DEVICE
         )
         plot_loss(losses, losses, "plots/loss.png", epoch)
-        plot_accuracy(accuracies, accuracies, "plots/accuracy.png", epoch)
+        plot_accuracy(accuracies_train, accuracies_val, "accuracy.png", epoch)
 
 
 if __name__ == "__main__":                                          #Needed for NUM_WORKERS
