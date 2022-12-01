@@ -59,6 +59,7 @@ def get_loaders(train_dir, train_maskdir, val_dir, val_maskdir,
                                     batch_size=batch_size,
                                     num_workers=num_workers,
                                     pin_memory=pin_memory,
+                                    drop_last = True,
                                     shuffle=True   )
 
     val_data = RoadSegDataset(      image_dir=val_dir,
@@ -66,10 +67,11 @@ def get_loaders(train_dir, train_maskdir, val_dir, val_maskdir,
                                     function=val_transform    )
 
     val_DataLoader = DataLoader(    val_data,
-                                batch_size=batch_size,
-                                num_workers=num_workers,
-                                pin_memory=pin_memory,
-                                shuffle=False   )
+                                    batch_size=batch_size,
+                                    num_workers=num_workers,
+                                    pin_memory=pin_memory,
+                                    drop_last = True,
+                                    shuffle=False   )
 
     return train_DataLoader, val_DataLoader
 
@@ -99,6 +101,8 @@ def check_accuracy(loader, model, device="cpu"):
     print( f"Accuracy: {num_correct/num_pixels*100:.2f}" )  #Output the scores
     
     model.train()                                           #Continue to train the model
+
+    return num_correct/num_pixels*100
 
 def save_predictions_as_masks(DataLoader, model, folder="saved_predictions", device="cpu"):
     """

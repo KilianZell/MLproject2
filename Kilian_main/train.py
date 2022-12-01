@@ -3,8 +3,11 @@ import torch.nn as nn
 import torch.optim as optim
 import albumentations as A #data augmentation
 from albumentations.pytorch import ToTensorV2
+from matplotlib import pyplot as plt
 from tqdm import tqdm #progress bar library
 from model import UNET
+from plot import plot_loss
+from plot import plot_accuracy
 from utils import (
     load_trained_model,
     save_trained_model,
@@ -14,17 +17,17 @@ from utils import (
 )
 
 #------Hyperparameters--------
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-5
 REGULARIZATION = 0
 DEVICE = torch.device("cpu")
 BATCH_SIZE = 5
-NUM_EPOCHS = 3 
-NUM_WORKERS = 8
-PIN_MEMORY = True
-LOAD_MODEL = False #False
+NUM_EPOCHS = 50 
+NUM_WORKERS = 1
+PIN_MEMORY = False
+LOAD_MODEL = False
 
-IMAGE_HEIGHT = 256  # 256 originally, please decomment in train_function if modified
-IMAGE_WIDTH = 256   # 256 originally, please decomment in train_function if modified
+IMAGE_HEIGHT = 256 # 256 originally
+IMAGE_WIDTH = 256  # 256 originally
 
 TRAIN_IMG_DIR =     "data/processing/train/images/"
 TRAIN_MASK_DIR =    "data/processing/train/masks/"
@@ -44,6 +47,8 @@ def train_fn(loader, model, optimizer, loss_fn, scaler):
     #Training of 1 epoch
     loop = tqdm(loader)                                     #Initiate the progress bar
 
+    losses = []
+
     for batch_idx, (data, targets) in enumerate(loop):
         data = data.to(device=DEVICE)
         targets = targets.float().unsqueeze(1).to(device=DEVICE)
@@ -52,6 +57,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler):
         with torch.cuda.amp.autocast():
             predictions = model(data)
             loss = loss_fn(predictions, targets)
+            losses.append(loss.item())
 
         # backward
         optimizer.zero_grad()
@@ -61,13 +67,15 @@ def train_fn(loader, model, optimizer, loss_fn, scaler):
 
         # update tqdm loop
         loop.set_postfix(loss=loss.item())
+    
+    return sum(losses)/len(losses) 
 
 
 def main():
     train_functions = A.Compose(   
     #Set the transformations for train dataset       
         [
-            #A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
+            A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
             A.Rotate(limit=90, p=0.2),
             A.HorizontalFlip(p=0.2),
             A.VerticalFlip(p=0.2),
@@ -97,7 +105,7 @@ def main():
     loss_fn = nn.BCEWithLogitsLoss()                                #Calls binary crossentropy from torch library, This loss combines a Sigmoid layer and the BCELoss in one single class. This version is more numerically stable than using a plain Sigmoid followed by a BCELoss as, by combining the operations into one layer, we take advantage of the log-sum-exp trick for numerical stability.
 
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE, 
-                            weight_decay=REGULARIZATION)            #Calls adam optimizer from torch library (slowly decreses the learning rate)
+                          weight_decay=REGULARIZATION)            #Calls adam optimizer from torch library (slowly decreses the learning rate)
 
     train_loader, val_loader = get_loaders(                         #Prepare data to load in the model
         TRAIN_IMG_DIR,
@@ -112,14 +120,17 @@ def main():
     )
 
     if LOAD_MODEL:
-        load_trained_model(torch.load("my_checkpoint.pth.tar"), model)
+        load_trained_model(torch.load("models/my_checkpoint.pth.tar"), model)
 
     check_accuracy(val_loader, model, device=DEVICE)                #Check accuracy at every step
     scaler = torch.cuda.amp.GradScaler()
 
+    losses = []
+    accuracies = []
     for epoch in range(NUM_EPOCHS):
     #Train model for n epochs
-        train_fn(train_loader, model, optimizer, loss_fn, scaler)
+        print("Epoch: ", epoch+1)
+        losses.append(train_fn(train_loader, model, optimizer, loss_fn, scaler))
 
         #Save model at every epoch
         checkpoint = {
@@ -128,13 +139,15 @@ def main():
         }
         save_trained_model(checkpoint)
 
-        check_accuracy(val_loader, model, device=DEVICE)            #Check accuracy
+        accuracies.append(check_accuracy(val_loader, model, device=DEVICE))            #Check accuracy
 
                                                                     
         save_predictions_as_masks(                                  #Get masks images from our predictions
             val_loader, model, folder="saved_predictions/", 
             device=DEVICE
         )
+        plot_loss(losses, losses, "loss.png", epoch)
+        plot_accuracy(accuracies, accuracies, "accuracy.png", epoch)
 
 
 if __name__ == "__main__":                                          #Needed for NUM_WORKERS

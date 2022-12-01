@@ -5,10 +5,10 @@ from skimage import io
 import splitfolders
 
 
-images_path=        "your_path/data/images"             #Path to the folder with the satelite images
-masks_path=         "your_path/data/groundtruth"        #Path to the folder with the groundtruth images
-images_aug_path =   "your_path/data/aug_data/images"    #Path to the augmented sat images
-masks_aug_path =    "your_path/data/aug_data/masks"     #Path to the augmented groundtruth images (called masks)
+images_path=        "/Users/kilianzell/Desktop/project2_ML/project_2/data/images"             #Path to the folder with the satelite images
+masks_path=         "/Users/kilianzell/Desktop/project2_ML/project_2/data/groundtruth"        #Path to the folder with the groundtruth images
+images_aug_path =   "/Users/kilianzell/Desktop/project2_ML/project_2/data/aug_data/images"    #Path to the augmented sat images
+masks_aug_path =    "/Users/kilianzell/Desktop/project2_ML/project_2/data/aug_data/masks"     #Path to the augmented groundtruth images (called masks)
 
 
 def trasnform_image(images_path, images_aug_path):
@@ -81,7 +81,7 @@ def data_aug(images_path, masks_path, images_aug_path, masks_aug_path):
 if __name__ == "__main__": 
     data_aug(images_path, masks_path, images_aug_path, masks_aug_path)                  #data augmentation
 
-    input_folder = "your_path/data/aug_data"
-    output =       "your_path/data/processing"
+    input_folder = "/Users/kilianzell/Desktop/project2_ML/project_2/data/aug_data"
+    output =       "/Users/kilianzell/Desktop/project2_ML/project_2/data/processing"
 
     splitfolders.ratio(input_folder, output=output, seed=42, ratio=(.95, 0.05, 0.0))    #Split the data between train and validation dataset
