@@ -28,8 +28,8 @@ labeled as road (label=1) or background (label=0).
 
 Here is a preview of our predictions on the test set
 <p align="center">
-  <img src="./Images/img_test.png" alt="Example of test image" width="300"/>
-  <img src="./Images/pred.png" alt="Predicted mask" width="300"/>
+  <img src="./Images/test_10.png" alt="Example of test image" width="300"/>
+  <img src="./Images/pred_test_010.png" alt="Predicted mask" width="300"/>
 </p>
 
 ## Summary
