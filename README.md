@@ -17,6 +17,9 @@ black.
   <img src="./Images/gt_img.png" title="Corresponding mask" width="300"/>
 </p>
 
+![Example of satellite image](./Images/sat_img.png)
+!["Corresponding mask](./Images/gt_img.png)
+
 To perform this task, we were given a training data-
 set consisting of 100 pairs of aerial images and their
 corresponding ground-truth, each with a size of 400×400
