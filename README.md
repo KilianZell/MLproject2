@@ -13,8 +13,8 @@ where roads are visible in white and the background in
 black.
 
 <p align="center">
-  <img src="./Images/img_sat.png" alt="Example of satellite image" width="300"/>
-  <img src="./Images/mask.png" alt="Corresponding mask" width="300"/>
+  <img src="./Images/sat_img.png" alt="Example of satellite image" width="300"/>
+  <img src="./Images/gt_img.png" alt="Corresponding mask" width="300"/>
 </p>
 
 To perform this task, we were given a training data-
