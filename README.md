@@ -7,10 +7,10 @@ Competition: EPFL ML Road Segmentation Challenge
 The goal of this project is to train a classifier to segment roads
 from Google Maps satellite images. We developped an encoder-
 decoder convolutional neural network that takes as entry
-aerial images and gives as output road-segmented images.
+aerial images (left image below) and gives as output road-segmented images.
 By default, such predictions take the form of “masks”,
 where roads are visible in white and the background in
-black.
+black (right image below).
 
 <p align="center">
   <img src="./Images/sat_img.png" alt="Example of satellite image" width="300"/>
