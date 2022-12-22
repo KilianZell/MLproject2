@@ -13,12 +13,9 @@ where roads are visible in white and the background in
 black.
 
 <p align="center">
-  <img src="./Images/sat_img.png" title="Example of satellite image" width="300"/>
-  <img src="./Images/gt_img.png" title="Corresponding mask" width="300"/>
+  <img src="./Images/sat_img.png" alt="Example of satellite image" width="300"/>
+  <img src="./Images/gt_img.png" alt="Corresponding mask" width="300"/>
 </p>
-
-![Example of satellite image](./Images/sat_img.png)
-!["Corresponding mask](./Images/gt_img.png)
 
 To perform this task, we were given a training data-
 set consisting of 100 pairs of aerial images and their
